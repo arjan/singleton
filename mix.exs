@@ -8,6 +8,10 @@ defmodule Singleton.Mixfile do
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     description: description(),
+     package: package(),
+     source_url: "https://github.com/arjan/singleton",
+     homepage_url: "https://github.com/arjan/singleton",
      deps: deps()]
   end
 

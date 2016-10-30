@@ -16,14 +16,15 @@ defmodule SingletonTest do
     assert {:ok, _} = Singleton.start_child(Foo, [], Foo)
     assert {:error, {:already_started, _}} = Singleton.start_child(Foo, [], Foo)
 
-    p = :global.whereis_name(Foo)
-    assert is_pid(p)
-    Process.exit(p, :kill)
+    assert is_pid(:global.whereis_name(Foo))
 
-    :timer.sleep(200)
+    assert :ok = Singleton.stop_child(Foo, [])
+    assert {:error, :not_found} = Singleton.stop_child(Foo, [])
 
-    p = :global.whereis_name(Foo)
-    assert is_pid(p)
+    assert :undefined = :global.whereis_name(Foo)
+
+    assert {:ok, _} = Singleton.start_child(Foo, [], Foo)
+    assert is_pid(:global.whereis_name(Foo))
 
   end
 

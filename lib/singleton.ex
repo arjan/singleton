@@ -34,7 +34,20 @@ defmodule Singleton do
 
   """
   def start_child(module, args, name) do
-    Supervisor.start_child(Singleton.Supervisor, [module, args, name])
+    child_name = name(module, args)
+    Supervisor.start_child(Singleton.Supervisor, [module, args, name, child_name])
+  end
+
+  def stop_child(module, args) do
+    child_name = name(module, args)
+    case Process.whereis(child_name) do
+      nil -> {:error, :not_found}
+      pid -> Supervisor.terminate_child(Singleton.Supervisor, pid)
+    end
+  end
+
+  defp name(module, args) do
+    String.to_atom("singleton_" <> Base.encode64("#{module}#{inspect args}", padding: false))
   end
 
 end

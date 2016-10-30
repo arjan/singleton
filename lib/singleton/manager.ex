@@ -22,9 +22,8 @@ defmodule Singleton.Manager do
   @doc """
   Start the manager process, registering it under a unique name.
   """
-  def start_link(mod, args, name) do
-    manager_name = "#{mod}#{inspect args}" |> String.to_atom
-    GenServer.start_link(__MODULE__, [mod, args, name], name: manager_name)
+  def start_link(mod, args, name, child_name) do
+    GenServer.start_link(__MODULE__, [mod, args, name], name: child_name)
   end
 
   @moduledoc false
