@@ -1,0 +1,2 @@
+MIX_ENV=test mix compile
+MIX_ENV=test iex --sname $1 -pa _build/test/lib/*/ebin -e Singleton.Dist.setup
