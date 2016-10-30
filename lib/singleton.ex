@@ -47,7 +47,8 @@ defmodule Singleton do
   end
 
   defp name(module, args) do
-    String.to_atom("singleton_" <> Base.encode64("#{module}#{inspect args}", padding: false))
+    bin = :crypto.hash(:sha, :erlang.term_to_binary({module, args}))
+    String.to_atom("singleton_" <> Base.encode64(bin, padding: false))
   end
 
 end
