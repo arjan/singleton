@@ -26,12 +26,15 @@ The package can be installed as:
 
 ## Usage
 
-Use `Singleton.start_child/3` to start a unique process.
+Use `Singleton.start_child/3` to start a unique GenServer process.
 
     Singleton.start_child(MyServer, [1], {:myserver, 1})
 
-Execute this command on all nodes. As soon as nodes connect, you'll
-see logger messages like:
+Execute this command on all nodes. The `MyServer` GenServer is now
+globally registered under the name `{:global, {:myserver, 1}}`.
+
+As soon as you connect nodes together, you'll see logger messages
+like:
 
     04:56:29.003 [info]  global: Name conflict terminating {MyServer, #PID<12501.68.0>}
 
