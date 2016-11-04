@@ -22,20 +22,21 @@ defmodule Singleton.Manager do
   @doc """
   Start the manager process, registering it under a unique name.
   """
-  def start_link(mod, args, name, child_name) do
-    GenServer.start_link(__MODULE__, [mod, args, name], name: child_name)
+  def start_link(mod, args, name, child_name, exit_strategy \\ :random_exit) do
+    GenServer.start_link(__MODULE__, [mod, args, name, exit_strategy], name: child_name)
   end
 
-  @moduledoc false
   defmodule State do
-    defstruct pid: nil, mod: nil, args: nil, name: nil
+    @moduledoc false
+    defstruct pid: nil, mod: nil, args: nil, name: nil, exit_strategy: nil
   end
 
   @doc false
-  def init([mod, args, name]) do
+  def init([mod, args, name, exit_strategy]) do
     state = %State{mod: mod,
                    args: args,
-                   name: name}
+                   name: name,
+                   exit_strategy: exit_strategy}
     {:ok, restart(state)}
   end
 
@@ -45,7 +46,7 @@ defmodule Singleton.Manager do
   end
 
   defp restart(state) do
-    start_result = GenServer.start_link(state.mod, state.args, name: {:global, state.name})
+    start_result = GenServer.start_link(state.mod, state.args, name: {:via, Singleton, {state.name, state.exit_strategy}})
     case start_result do
       {:ok, pid} ->
         %State{state | pid: pid}
