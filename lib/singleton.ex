@@ -16,7 +16,7 @@ defmodule Singleton do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(Singleton.Manager, [], restart: :permanent),
+      worker(Singleton.Manager, [], restart: :transient),
     ]
 
     opts = [strategy: :simple_one_for_one, name: Singleton.Supervisor]

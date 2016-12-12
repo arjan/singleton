@@ -40,19 +40,23 @@ defmodule Singleton.Manager do
   end
 
   @doc false
-  def handle_info({:DOWN, _, :process, pid, _}, state = %State{pid: pid}) do
+  def handle_info({:DOWN, _, :process, pid, :normal}, state = %State{pid: pid}) do
+    # Managed process exited normally. Shut manager down as well.
+    {:stop, :normal, state}
+  end
+  def handle_info({:DOWN, _, :process, pid, reason}, state = %State{pid: pid}) do
+    # Managed process exited with an error. Try restarting.
     {:noreply, restart(state)}
   end
 
   defp restart(state) do
     start_result = GenServer.start_link(state.mod, state.args, name: {:global, state.name})
-    case start_result do
-      {:ok, pid} ->
-        %State{state | pid: pid}
-      {:error, {:already_started, pid}} ->
-        Process.monitor(pid)
-        %State{state | pid: pid}
-    end
+    pid = case start_result do
+            {:ok, pid} -> pid
+            {:error, {:already_started, pid}} -> pid
+          end
+    Process.monitor(pid)
+    %State{state | pid: pid}
   end
 
 end

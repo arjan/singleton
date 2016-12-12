@@ -7,7 +7,6 @@ defmodule SingletonTest do
     require Logger
 
     def init([]) do
-      Logger.warn "Foo start: #{inspect self}"
       {:ok, 1}
     end
   end
@@ -25,6 +24,33 @@ defmodule SingletonTest do
 
     assert {:ok, _} = Singleton.start_child(Foo, [], Foo)
     assert is_pid(:global.whereis_name(Foo))
+
+  end
+
+
+  defmodule ExitingServer do
+    use GenServer
+    require Logger
+
+    def init([]) do
+      {:ok, 1}
+    end
+
+    def handle_call(:stop, _from, state) do
+      {:stop, :normal, :ok, state}
+    end
+  end
+
+
+  test "child process normal exit" do
+    assert {:ok, _} = Singleton.start_child(ExitingServer, [], ExitingServer)
+    assert is_pid(:global.whereis_name(ExitingServer))
+
+    GenServer.call({:global, ExitingServer}, :stop)
+    :timer.sleep 10
+
+    assert {:ok, _} = Singleton.start_child(ExitingServer, [], ExitingServer)
+    assert is_pid(:global.whereis_name(ExitingServer))
 
   end
 

@@ -3,7 +3,7 @@ defmodule Singleton.Mixfile do
 
   def project do
     [app: :singleton,
-     version: "1.1.1",
+     version: "1.2.0",
      elixir: "~> 1.3",
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
