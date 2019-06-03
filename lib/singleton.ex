@@ -16,7 +16,7 @@ defmodule Singleton do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(Singleton.Manager, [], restart: :transient),
+      worker(Singleton.Manager, [], restart: :transient)
     ]
 
     opts = [strategy: :simple_one_for_one, name: Singleton.Supervisor]
@@ -35,11 +35,19 @@ defmodule Singleton do
   """
   def start_child(module, args, name) do
     child_name = name(module, args)
-    Supervisor.start_child(Singleton.Supervisor, [module, args, name, child_name])
+
+    case Supervisor.start_child(Singleton.Supervisor, [module, args, name, child_name]) do
+      {:ok, _} = ok_result ->
+        ok_result
+
+      other ->
+        raise "Could not start singleton #{inspect(child_name)}: #{inspect(other, pretty: true)}"
+    end
   end
 
   def stop_child(module, args) do
     child_name = name(module, args)
+
     case Process.whereis(child_name) do
       nil -> {:error, :not_found}
       pid -> Supervisor.terminate_child(Singleton.Supervisor, pid)
@@ -50,5 +58,4 @@ defmodule Singleton do
     bin = :crypto.hash(:sha, :erlang.term_to_binary({module, args}))
     String.to_atom("singleton_" <> Base.encode64(bin, padding: false))
   end
-
 end
