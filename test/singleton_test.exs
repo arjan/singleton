@@ -43,8 +43,6 @@ defmodule SingletonTest do
   test "child process normal exit" do
     assert {:ok, _} = Singleton.start_child(ExitingServer, [], ExitingServer)
     assert is_pid(:global.whereis_name(ExitingServer))
-    require IEx
-    IEx.pry()
 
     GenServer.call({:global, ExitingServer}, :stop)
     :timer.sleep(10)

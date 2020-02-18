@@ -13,13 +13,6 @@ defmodule Singleton do
   require Logger
 
   def start(_, _) do
-    #    import Supervisor.Spec, warn: false
-    #
-    #    children = [
-    #      worker(Singleton.Manager, [], restart: :transient),
-    #    ]
-    #
-    #    opts =
     DynamicSupervisor.start_link(strategy: :one_for_one, name: Singleton.Supervisor)
   end
 

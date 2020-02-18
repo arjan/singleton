@@ -15,7 +15,7 @@ defmodule Singleton.Manager do
 
   """
 
-  use GenServer
+  use GenServer, restart: :transient
 
   require Logger
 
@@ -39,12 +39,10 @@ defmodule Singleton.Manager do
   @doc false
   def handle_info({:DOWN, _, :process, pid, :normal}, state = %State{pid: pid}) do
     # Managed process exited normally. Shut manager down as well.
-    IO.inspect("shutting down")
     {:stop, :normal, state}
   end
 
   def handle_info({:DOWN, _, :process, pid, _reason}, state = %State{pid: pid}) do
-    IO.inspect("shutting down")
     # Managed process exited with an error. Try restarting.
     {:noreply, restart(state)}
   end
