@@ -22,41 +22,43 @@ defmodule Singleton.Manager do
   @doc """
   Start the manager process, registering it under a unique name.
   """
-  def start_link(mod, args, name, child_name) do
+  def start_link(mod: mod, args: args, name: name, child_name: child_name) do
     GenServer.start_link(__MODULE__, [mod, args, name], name: child_name)
   end
 
-  @moduledoc false
   defmodule State do
     defstruct pid: nil, mod: nil, args: nil, name: nil
   end
 
   @doc false
   def init([mod, args, name]) do
-    state = %State{mod: mod,
-                   args: args,
-                   name: name}
+    state = %State{mod: mod, args: args, name: name}
     {:ok, restart(state)}
   end
 
   @doc false
   def handle_info({:DOWN, _, :process, pid, :normal}, state = %State{pid: pid}) do
     # Managed process exited normally. Shut manager down as well.
+    IO.inspect("shutting down")
     {:stop, :normal, state}
   end
-  def handle_info({:DOWN, _, :process, pid, reason}, state = %State{pid: pid}) do
+
+  def handle_info({:DOWN, _, :process, pid, _reason}, state = %State{pid: pid}) do
+    IO.inspect("shutting down")
     # Managed process exited with an error. Try restarting.
     {:noreply, restart(state)}
   end
 
   defp restart(state) do
     start_result = GenServer.start_link(state.mod, state.args, name: {:global, state.name})
-    pid = case start_result do
-            {:ok, pid} -> pid
-            {:error, {:already_started, pid}} -> pid
-          end
+
+    pid =
+      case start_result do
+        {:ok, pid} -> pid
+        {:error, {:already_started, pid}} -> pid
+      end
+
     Process.monitor(pid)
     %State{state | pid: pid}
   end
-
 end
