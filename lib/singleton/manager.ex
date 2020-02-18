@@ -27,6 +27,7 @@ defmodule Singleton.Manager do
   end
 
   defmodule State do
+    @moduledoc false
     defstruct pid: nil, mod: nil, args: nil, name: nil
   end
 
