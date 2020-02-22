@@ -2,9 +2,10 @@ defmodule Singleton do
   @moduledoc """
   Singleton application.
 
-  The top supervisor of singleton is a DynamicSupervisor. Singleton
-  can manage many singleton processes at the same time. Each singleton
-  is identified by its unique `name` term.
+  The top supervisor of the `:singleton` OTP application is a
+  DynamicSupervisor. Singleton can manage many singleton processes at
+  the same time. Each singleton is identified by its unique `name`
+  term.
 
   """
 

@@ -42,7 +42,8 @@ defmodule Singleton.Mixfile do
 
   defp deps do
     [
-      {:dialyxir, "~> 1.2", only: [:test, :dev], runtime: false}
+      {:dialyxir, "~> 1.2", only: [:test, :dev], runtime: false},
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
     ]
   end
 
