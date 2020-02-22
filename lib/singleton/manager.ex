@@ -51,12 +51,16 @@ defmodule Singleton.Manager do
   end
 
   defp start_and_monitor(state) do
-    start_result = GenServer.start_link(state.mod, state.args, name: {:global, state.name})
+    start_result =
+      GenServer.start_link(state.mod, state.args, name: {:global, state.name})
 
     pid =
       case start_result do
         {:ok, pid} ->
-          Logger.info("Singleton #{state.name} started with pid #{pid |> inspect()}")
+          Logger.info(
+            "Singleton #{state.name} started with pid #{pid |> inspect()}"
+          )
+
           pid
 
         {:error, {:already_started, pid}} ->

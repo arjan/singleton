@@ -35,7 +35,13 @@ defmodule Singleton do
   """
   def start_child(module, args, name) do
     child_name = name(module, args)
-    Supervisor.start_child(Singleton.Supervisor, [module, args, name, child_name])
+
+    Supervisor.start_child(Singleton.Supervisor, [
+      module,
+      args,
+      name,
+      child_name
+    ])
   end
 
   def stop_child(module, args) do
