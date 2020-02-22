@@ -13,14 +13,10 @@ defmodule Singleton do
   require Logger
 
   def start(_, _) do
-    import Supervisor.Spec, warn: false
-
-    children = [
-      worker(Singleton.Manager, [], restart: :transient)
-    ]
-
-    opts = [strategy: :simple_one_for_one, name: Singleton.Supervisor]
-    Supervisor.start_link(children, opts)
+    DynamicSupervisor.start_link(
+      strategy: :one_for_one,
+      name: Singleton.Supervisor
+    )
   end
 
   @doc """
@@ -36,12 +32,11 @@ defmodule Singleton do
   def start_child(module, args, name) do
     child_name = name(module, args)
 
-    Supervisor.start_child(Singleton.Supervisor, [
-      module,
-      args,
-      name,
-      child_name
-    ])
+    spec =
+      {Singleton.Manager,
+       [mod: module, args: args, name: name, child_name: child_name]}
+
+    DynamicSupervisor.start_child(Singleton.Supervisor, spec)
   end
 
   def stop_child(module, args) do
@@ -49,7 +44,7 @@ defmodule Singleton do
 
     case Process.whereis(child_name) do
       nil -> {:error, :not_found}
-      pid -> Supervisor.terminate_child(Singleton.Supervisor, pid)
+      pid -> DynamicSupervisor.terminate_child(Singleton.Supervisor, pid)
     end
   end
 
