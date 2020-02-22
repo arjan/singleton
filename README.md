@@ -1,5 +1,8 @@
 # Singleton
 
+[![Build Status](https://travis-ci.com/arjan/singleton.svg?branch=master)](https://travis-ci.com/arjan/singleton)
+[![Hex pm](http://img.shields.io/hexpm/v/singleton.svg?style=flat)](https://hex.pm/packages/singleton)
+
 Convenience wrapper library around Erlang's `global` module to ensure
 a single instance of a process is kept running on a cluster of nodes.
 
