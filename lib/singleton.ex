@@ -35,14 +35,7 @@ defmodule Singleton do
   """
   def start_child(module, args, name) do
     child_name = name(module, args)
-
-    case Supervisor.start_child(Singleton.Supervisor, [module, args, name, child_name]) do
-      {:ok, _} = ok_result ->
-        ok_result
-
-      other ->
-        raise "Could not start singleton #{inspect(child_name)}: #{inspect(other, pretty: true)}"
-    end
+    Supervisor.start_child(Singleton.Supervisor, [module, args, name, child_name])
   end
 
   def stop_child(module, args) do
