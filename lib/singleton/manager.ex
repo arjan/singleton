@@ -45,7 +45,7 @@ defmodule Singleton.Manager do
 
   def handle_info({:DOWN, _, :process, pid, _reason}, state = %State{pid: pid}) do
     # Managed process exited with an error. Try restarting, after a delay
-    Process.sleep(:random.uniform(5_000) + 5_000)
+    Process.sleep(:rand.uniform(5_000) + 5_000)
     {:noreply, restart(state)}
   end
 
