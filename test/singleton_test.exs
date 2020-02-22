@@ -1,5 +1,6 @@
 defmodule SingletonTest do
   use ExUnit.Case
+
   # doctest Singleton
 
   defmodule Foo do

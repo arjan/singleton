@@ -15,14 +15,14 @@ defmodule Singleton.Manager do
 
   """
 
-  use GenServer
+  use GenServer, restart: :transient
 
   require Logger
 
   @doc """
   Start the manager process, registering it under a unique name.
   """
-  def start_link(mod, args, name, child_name) do
+  def start_link(mod: mod, args: args, name: name, child_name: child_name) do
     GenServer.start_link(__MODULE__, [mod, args, name], name: child_name)
   end
 
@@ -34,7 +34,7 @@ defmodule Singleton.Manager do
   @doc false
   def init([mod, args, name]) do
     state = %State{mod: mod, args: args, name: name}
-    {:ok, start_and_monitor(state)}
+    {:ok, restart(state)}
   end
 
   @doc false
@@ -44,27 +44,19 @@ defmodule Singleton.Manager do
   end
 
   def handle_info({:DOWN, _, :process, pid, _reason}, state = %State{pid: pid}) do
-    # Managed process exited with an error. Try restarting after 10 seconds
-    # (delay to prevent crashloops from consuming too much resources)
-    Process.sleep(10_000)
-    {:noreply, start_and_monitor(state)}
+    # Managed process exited with an error. Try restarting, after a delay
+    Process.sleep(:random.uniform(5_000) + 5_000)
+    {:noreply, restart(state)}
   end
 
-  defp start_and_monitor(state) do
+  defp restart(state) do
     start_result =
       GenServer.start_link(state.mod, state.args, name: {:global, state.name})
 
     pid =
       case start_result do
-        {:ok, pid} ->
-          Logger.info(
-            "Singleton #{state.name} started with pid #{pid |> inspect()}"
-          )
-
-          pid
-
-        {:error, {:already_started, pid}} ->
-          pid
+        {:ok, pid} -> pid
+        {:error, {:already_started, pid}} -> pid
       end
 
     Process.monitor(pid)

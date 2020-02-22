@@ -5,7 +5,7 @@ defmodule Singleton.Mixfile do
     [
       app: :singleton,
       version: "1.2.0",
-      elixir: "~> 1.3",
+      elixir: "~> 1.6",
       elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
