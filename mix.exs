@@ -13,7 +13,9 @@ defmodule Singleton.Mixfile do
       package: package(),
       source_url: "https://github.com/arjan/singleton",
       homepage_url: "https://github.com/arjan/singleton",
-      deps: deps()
+      deps: deps(),
+      aliases: aliases(),
+      preferred_cli_env: [quality: :test]
     ]
   end
 
@@ -39,6 +41,19 @@ defmodule Singleton.Mixfile do
   defp elixirc_paths(_), do: ["lib"]
 
   defp deps do
-    []
+    [
+      {:dialyxir, "~> 0.5", only: [:test, :dev], runtime: false}
+    ]
+  end
+
+  defp aliases do
+    [
+      quality: [
+        "format --check-formatted",
+        "compile --force --all-warnings --warnings-as-errors",
+        "test",
+        "dialyzer"
+      ]
+    ]
   end
 end
