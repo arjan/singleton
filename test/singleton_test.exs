@@ -24,9 +24,7 @@ defmodule SingletonTest do
 
     assert {:ok, _} = Singleton.start_child(Foo, [], Foo)
     assert is_pid(:global.whereis_name(Foo))
-
   end
-
 
   defmodule ExitingServer do
     use GenServer
@@ -41,19 +39,16 @@ defmodule SingletonTest do
     end
   end
 
-
   test "child process normal exit" do
     assert {:ok, _} = Singleton.start_child(ExitingServer, [], ExitingServer)
     assert is_pid(:global.whereis_name(ExitingServer))
 
     GenServer.call({:global, ExitingServer}, :stop)
-    :timer.sleep 10
+    :timer.sleep(10)
 
     assert {:ok, _} = Singleton.start_child(ExitingServer, [], ExitingServer)
     assert is_pid(:global.whereis_name(ExitingServer))
-
   end
 
   # FIXME test multi-node scenario
-
 end
