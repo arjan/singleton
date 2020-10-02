@@ -27,21 +27,21 @@ defmodule Singleton.Manager do
         args: args,
         name: name,
         child_name: child_name,
-        on_stop: on_stop
+        on_conflict: on_conflict
       ) do
-    GenServer.start_link(__MODULE__, [mod, args, name, on_stop],
+    GenServer.start_link(__MODULE__, [mod, args, name, on_conflict],
       name: child_name
     )
   end
 
   defmodule State do
     @moduledoc false
-    defstruct pid: nil, mod: nil, args: nil, name: nil, on_stop: nil
+    defstruct pid: nil, mod: nil, args: nil, name: nil, on_conflict: nil
   end
 
   @doc false
-  def init([mod, args, name, on_stop]) do
-    state = %State{mod: mod, args: args, name: name, on_stop: on_stop}
+  def init([mod, args, name, on_conflict]) do
+    state = %State{mod: mod, args: args, name: name, on_conflict: on_conflict}
     {:ok, restart(state)}
   end
 
@@ -67,7 +67,7 @@ defmodule Singleton.Manager do
           pid
 
         {:error, {:already_started, pid}} ->
-          state.on_stop.()
+          state.on_conflict.()
           pid
       end
 

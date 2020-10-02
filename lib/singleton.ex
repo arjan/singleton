@@ -20,7 +20,7 @@ defmodule Singleton do
   end
 
   @doc """
-  Start a new singleton process. Optionally provide the `on_stop`
+  Start a new singleton process. Optionally provide the `on_conflict`
   parameter which will be called whenever a singleton process shuts
   down due to another instance being present in the cluster.
 
@@ -31,7 +31,7 @@ defmodule Singleton do
   case of node disconnects or crashes.
 
   """
-  def start_child(module, args, name, on_stop \\ fn -> nil end) do
+  def start_child(module, args, name, on_conflict \\ fn -> nil end) do
     child_name = name(module, args)
 
     spec =
@@ -41,7 +41,7 @@ defmodule Singleton do
          args: args,
          name: name,
          child_name: child_name,
-         on_stop: on_stop
+         on_conflict: on_conflict
        ]}
 
     DynamicSupervisor.start_child(Singleton.Supervisor, spec)
