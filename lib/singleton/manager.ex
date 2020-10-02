@@ -29,8 +29,8 @@ defmodule Singleton.Manager do
         child_name: child_name,
         on_conflict: on_conflict
       ) do
-    GenServer.start_link(__MODULE__, [mod, args, name, on_conflict],
-      name: child_name
+    GenServer.start_link(__MODULE__, [mod, args, child_name, on_conflict],
+      name: name
     )
   end
 
