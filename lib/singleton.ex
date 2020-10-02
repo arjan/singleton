@@ -1,23 +1,11 @@
 defmodule Singleton do
   @moduledoc """
-  Singleton application.
+  Singleton.
 
   The top supervisor of singleton is a DynamicSupervisor. Singleton
   can manage many singleton processes at the same time. Each singleton
   is identified by its unique `name` term.
-
   """
-
-  use Application
-
-  require Logger
-
-  def start(_, _) do
-    DynamicSupervisor.start_link(
-      strategy: :one_for_one,
-      name: Singleton.Supervisor
-    )
-  end
 
   @doc """
   Start a new singleton process. Optionally provide the `on_conflict`
@@ -39,12 +27,30 @@ defmodule Singleton do
        [
          mod: module,
          args: args,
-         name: name,
-         child_name: child_name,
+         name: child_name,
+         child_name: name,
          on_conflict: on_conflict
        ]}
 
-    DynamicSupervisor.start_child(Singleton.Supervisor, spec)
+    case Process.whereis(Singleton.Supervisor) do
+      nil ->
+        raise("""
+        Singleton.Supervisor must be added to your application's supervision tree.
+
+        If your application includes a supervision tree in `application.ex`, you can
+        simply add `Singleton.Supervisor` to the list of children.
+
+            children = [
+              ...,
+              Singleton.Supervisor
+            ]
+
+            supervisor = Supervisor.start_link(children, opts)
+        """)
+
+      _pid ->
+        DynamicSupervisor.start_child(Singleton.Supervisor, spec)
+    end
   end
 
   def stop_child(module, args) do
