@@ -13,25 +13,30 @@ The package can be installed as:
 
   1. Add `singleton` to your list of dependencies in `mix.exs`:
 
-    ```elixir
-    def deps do
-      [{:singleton, "~> 1.0.0"}]
-    end
-    ```
+```elixir
+def deps do
+  [{:singleton, "~> 1.0.0"}]
+end
+```
 
-  2. Ensure `singleton` is started before your application:
+  2. Ensure `Singleton.Supervisor` is added to your application's supervision tree:
 
-    ```elixir
-    def application do
-      [applications: [:singleton]]
-    end
-    ```
+If your application includes a supervision tree in `application.ex`, you can simply add `Singleton.Supervisor` to the list of children.
+```elixir
+children = [
+  # ...,
+  Singleton.Supervisor
+]
+
+supervisor = Supervisor.start_link(children, opts)
+```
 
 ## Usage
 
 Use `Singleton.start_child/3` to start a unique GenServer process.
-
-    Singleton.start_child(MyServer, [1], {:myserver, 1})
+```elixir
+Singleton.start_child(MyServer, [1], {:myserver, 1})
+```
 
 Execute this command on all nodes. The `MyServer` GenServer is now
 globally registered under the name `{:global, {:myserver, 1}}`.
