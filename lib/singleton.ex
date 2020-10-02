@@ -28,8 +28,8 @@ defmodule Singleton do
        [
          mod: module,
          args: args,
-         name: child_name,
-         child_name: name,
+         name: name,
+         child_name: child_name,
          on_conflict: on_conflict
        ]}
 
