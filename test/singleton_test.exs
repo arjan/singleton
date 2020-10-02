@@ -1,6 +1,11 @@
 defmodule SingletonTest do
   use ExUnit.Case
 
+  setup do
+    {:ok, pid} = Singleton.Supervisor.start_link([])
+    {:ok, pid: pid}
+  end
+
   # doctest Singleton
 
   defmodule Foo do
