@@ -19,7 +19,7 @@ defmodule Singleton do
   case of node disconnects or crashes.
 
   """
-  def start_child(module, args, name, on_conflict \\ fn -> nil end) do
+  def start_child(supervisor_name, module, args, name, on_conflict \\ fn -> nil end) do
     child_name = name(module, args)
 
     spec =
@@ -32,9 +32,11 @@ defmodule Singleton do
          on_conflict: on_conflict
        ]}
 
-    case Process.whereis(Singleton.Supervisor) do
+    case Process.whereis(supervisor_name) do
       nil ->
         raise("""
+        No process found with name #{supervisor_name}.
+
         Singleton.Supervisor must be added to your application's supervision tree.
 
         If your application includes a supervision tree in `application.ex`, you can
@@ -42,23 +44,23 @@ defmodule Singleton do
 
             children = [
               ...,
-              Singleton.Supervisor
+              {Singleton.Supervisor, name: MyApp.Sinlgeton}
             ]
 
             supervisor = Supervisor.start_link(children, opts)
         """)
 
       _pid ->
-        DynamicSupervisor.start_child(Singleton.Supervisor, spec)
+        DynamicSupervisor.start_child(supervisor_name, spec)
     end
   end
 
-  def stop_child(module, args) do
+  def stop_child(supervisor_name, module, args) do
     child_name = name(module, args)
 
     case Process.whereis(child_name) do
       nil -> {:error, :not_found}
-      pid -> DynamicSupervisor.terminate_child(Singleton.Supervisor, pid)
+      pid -> DynamicSupervisor.terminate_child(supervisor_name, pid)
     end
   end
 

@@ -10,7 +10,7 @@ defmodule Singleton.Dist do
   end
 
   def setup do
-    Application.start(:singleton)
-    Singleton.start_child(TestServer, [], TestServer)
+    {:ok, _pid} = Singleton.Supervisor.start_link(name: Singleton.Supervisor)
+    Singleton.start_child(Singleton.Supervisor, TestServer, [], TestServer)
   end
 end
