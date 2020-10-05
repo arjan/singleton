@@ -34,7 +34,7 @@ defmodule Singleton.Mixfile do
 
   # Configuration for the OTP application
   def application do
-    [applications: [:logger], mod: {Singleton, {}}]
+    [applications: [:logger]]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
