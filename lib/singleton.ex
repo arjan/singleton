@@ -19,7 +19,13 @@ defmodule Singleton do
   case of node disconnects or crashes.
 
   """
-  def start_child(supervisor_name, module, args, name, on_conflict \\ fn -> nil end) do
+  def start_child(
+        supervisor_name,
+        module,
+        args,
+        name,
+        on_conflict \\ fn -> nil end
+      ) do
     child_name = name(module, args)
 
     spec =
