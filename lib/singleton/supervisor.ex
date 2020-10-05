@@ -7,8 +7,8 @@ defmodule Singleton.Supervisor do
 
   require Logger
 
-  def start_link(init_arg) do
-    DynamicSupervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
+  def start_link(name: name) do
+    DynamicSupervisor.start_link(__MODULE__, [], name: name)
   end
 
   @impl true
