@@ -27,31 +27,60 @@ defmodule Singleton.Manager do
         args: args,
         name: name,
         child_name: child_name,
-        on_conflict: on_conflict
+        on_conflict: on_conflict,
+        permanent: permanent
       ) do
-    GenServer.start_link(__MODULE__, [mod, args, name, on_conflict],
+    GenServer.start_link(__MODULE__, [mod, args, name, on_conflict, permanent],
       name: child_name
     )
   end
 
   defmodule State do
     @moduledoc false
-    defstruct pid: nil, mod: nil, args: nil, name: nil, on_conflict: nil
+    defstruct pid: nil,
+              mod: nil,
+              args: nil,
+              name: nil,
+              on_conflict: nil,
+              permanent: false
   end
 
   @doc false
-  def init([mod, args, name, on_conflict]) do
-    state = %State{mod: mod, args: args, name: name, on_conflict: on_conflict}
+  def init([mod, args, name, on_conflict, permanent]) do
+    state = %State{
+      mod: mod,
+      args: args,
+      name: name,
+      on_conflict: on_conflict,
+      permanent: permanent
+    }
+
     {:ok, restart(state)}
   end
 
   @doc false
-  def handle_info({:DOWN, _, :process, pid, :normal}, state = %State{pid: pid}) do
+  def handle_info(
+        {:DOWN, _, :process, pid, :normal},
+        state = %State{pid: pid, permanent: false}
+      ) do
     # Managed process exited normally. Shut manager down as well.
     {:stop, :normal, state}
   end
 
+  @doc false
+  def handle_info(
+        {:DOWN, _, :process, pid, :normal},
+        state = %State{pid: pid, permanent: true}
+      ) do
+    # restart if permanent flag
+    restart_after_sleep(state)
+  end
+
   def handle_info({:DOWN, _, :process, pid, _reason}, state = %State{pid: pid}) do
+    restart_after_sleep(state)
+  end
+
+  defp restart_after_sleep(state) do
     # Managed process exited with an error. Try restarting, after a delay
     Process.sleep(:rand.uniform(5_000) + 5_000)
     {:noreply, restart(state)}
