@@ -76,8 +76,9 @@ defmodule SingletonTest do
     assert {:error, {:already_started, _}} =
              Singleton.start_child(ExitingServer, [], ExitingServer)
 
-    DynamicSupervisor.stop(singleton)
+    DynamicSupervisor.stop(singleton, :shutdown)
     :timer.sleep(10)
+    assert is_pid(:global.whereis_name(ExitingServer)) == false
   end
 
   # FIXME test multi-node scenario
