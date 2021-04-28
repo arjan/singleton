@@ -47,8 +47,37 @@ defmodule SingletonTest do
     GenServer.call({:global, ExitingServer}, :stop)
     :timer.sleep(10)
 
-    assert {:ok, _} = Singleton.start_child(ExitingServer, [], ExitingServer)
+    assert {:ok, singleton} =
+             Singleton.start_child(ExitingServer, [], ExitingServer)
+
     assert is_pid(:global.whereis_name(ExitingServer))
+
+    # not keep process after test
+    DynamicSupervisor.stop(singleton)
+
+    :timer.sleep(10)
+  end
+
+  test "child process normal exit, keep permanent" do
+    assert {:ok, singleton} =
+             Singleton.start_child(
+               ExitingServer,
+               [],
+               ExitingServer,
+               fn -> nil end,
+               true
+             )
+
+    assert is_pid(:global.whereis_name(ExitingServer))
+
+    GenServer.call({:global, ExitingServer}, :stop)
+    :timer.sleep(10)
+
+    assert {:error, {:already_started, _}} =
+             Singleton.start_child(ExitingServer, [], ExitingServer)
+
+    DynamicSupervisor.stop(singleton)
+    :timer.sleep(10)
   end
 
   # FIXME test multi-node scenario

@@ -24,6 +24,10 @@ defmodule Singleton do
   parameter which will be called whenever a singleton process shuts
   down due to another instance being present in the cluster.
 
+  Parameter `permanent` if set to true, allows to keep process alive
+  even if normal shutdown, eg: elixir cluster of machines, node with 
+  singleton is shut down normally.
+
   This function needs to be executed on all nodes where the singleton
   process is allowed to live. The actual process will be started only
   once; a manager process is started on each node for each singleton
@@ -31,7 +35,13 @@ defmodule Singleton do
   case of node disconnects or crashes.
 
   """
-  def start_child(module, args, name, on_conflict \\ fn -> nil end) do
+  def start_child(
+        module,
+        args,
+        name,
+        on_conflict \\ fn -> nil end,
+        permanent \\ false
+      ) do
     child_name = name(module, args)
 
     spec =
@@ -41,7 +51,8 @@ defmodule Singleton do
          args: args,
          name: name,
          child_name: child_name,
-         on_conflict: on_conflict
+         on_conflict: on_conflict,
+         permanent: permanent
        ]}
 
     DynamicSupervisor.start_child(Singleton.Supervisor, spec)
