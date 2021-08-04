@@ -13,10 +13,7 @@ defmodule Singleton do
   require Logger
 
   def start(_, _) do
-    DynamicSupervisor.start_link(
-      strategy: :one_for_one,
-      name: Singleton.Supervisor
-    )
+    DynamicSupervisor.start_link(dynamic_supervisor_options())
   end
 
   @doc """
@@ -59,5 +56,13 @@ defmodule Singleton do
   defp name(module, args) do
     bin = :crypto.hash(:sha, :erlang.term_to_binary({module, args}))
     String.to_atom("singleton_" <> Base.encode64(bin, padding: false))
+  end
+
+  defp dynamic_supervisor_options() do
+    [
+      strategy: :one_for_one,
+      name: Singleton.Supervisor
+    ]
+    |> Keyword.merge(Application.get_env(:singleton, :dynamic_supervisor, []))
   end
 end
