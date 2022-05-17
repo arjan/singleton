@@ -43,3 +43,15 @@ like:
 
 When you now stop (or disconnect) the node on which the singleton
 process runs, you'll see it get started on one of the other nodes.
+
+## Troubleshooting
+
+### More than 3 singleton processes `[info]  Application singleton exited: shutdown`
+
+In case you run more than 3 singleton you'll need to increase the
+`max_restarts` of `DynamicSupervisor`.
+
+```elixir
+config :singleton,
+  dynamic_supervisor: [max_restarts: 100]
+```
