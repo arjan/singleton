@@ -51,7 +51,7 @@ defmodule Singleton do
 
             children = [
               ...,
-              {Singleton.Supervisor, name: MyApp.Sinlgeton}
+              {Singleton.Supervisor, name: MyApp.Singleton}
             ]
 
             supervisor = Supervisor.start_link(children, opts)

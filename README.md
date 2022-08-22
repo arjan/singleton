@@ -25,7 +25,7 @@ If your application includes a supervision tree in `application.ex`, you can sim
 ```elixir
 children = [
   # ...,
-  {Singleton.Supervisor, name: MyApp.Sinlgeton}
+  {Singleton.Supervisor, name: MyApp.Singleton}
 ]
 
 supervisor = Supervisor.start_link(children, opts)
@@ -35,7 +35,7 @@ supervisor = Supervisor.start_link(children, opts)
 
 Use `Singleton.start_child/3` to start a unique GenServer process.
 ```elixir
-Singleton.start_child(MyApp.Sinlgeton, MyServer, [1], {:myserver, 1})
+Singleton.start_child(MyApp.Singleton, MyServer, [1], {:myserver, 1})
 ```
 
 Execute this command on all nodes. The `MyServer` GenServer is now
