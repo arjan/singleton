@@ -6,7 +6,7 @@ defmodule Singleton do
   can manage many singleton processes at the same time. Each singleton
   is identified by its unique `name` term.
   """
-
+  
   @doc """
   Start a new singleton process. Optionally provide the `on_conflict`
   parameter which will be called whenever a singleton process shuts
@@ -73,5 +73,13 @@ defmodule Singleton do
   defp name(module, args) do
     bin = :crypto.hash(:sha, :erlang.term_to_binary({module, args}))
     String.to_atom("singleton_" <> Base.encode64(bin, padding: false))
+  end
+
+  defp dynamic_supervisor_options() do
+    [
+      strategy: :one_for_one,
+      name: Singleton.Supervisor
+    ]
+    |> Keyword.merge(Application.get_env(:singleton, :dynamic_supervisor, []))
   end
 end
