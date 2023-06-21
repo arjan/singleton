@@ -11,21 +11,21 @@ a single instance of a process is kept running on a cluster of nodes.
 
 The package can be installed as:
 
-  1. Add `singleton` to your list of dependencies in `mix.exs`:
+1. Add `singleton` to your list of dependencies in `mix.exs`:
 
-    ```elixir
-    def deps do
-      [{:singleton, "~> 1.0.0"}]
-    end
-    ```
+```elixir
+def deps do
+  [{:singleton, "~> 1.0.0"}]
+end
+```
 
-  2. Ensure `singleton` is started before your application:
+2. Ensure `singleton` is started before your application:
 
-    ```elixir
-    def application do
-      [applications: [:singleton]]
-    end
-    ```
+```elixir
+def application do
+  [applications: [:singleton]]
+end
+```
 
 ## Usage
 
