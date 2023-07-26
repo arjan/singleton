@@ -4,7 +4,7 @@ defmodule Singleton.Dist do
     require Logger
 
     def init([]) do
-      Logger.warn("TestServer start: #{inspect(self())}")
+      Logger.warning("TestServer start: #{inspect(self())}")
       {:ok, nil}
     end
   end

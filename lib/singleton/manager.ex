@@ -22,15 +22,11 @@ defmodule Singleton.Manager do
   @doc """
   Start the manager process, registering it under a unique name.
   """
-  def start_link(
-        mod: mod,
-        args: args,
-        name: name,
-        child_name: child_name,
-        on_conflict: on_conflict
-      ) do
-    GenServer.start_link(__MODULE__, [mod, args, name, on_conflict],
-      name: child_name
+  def start_link(spec) do
+    GenServer.start_link(
+      __MODULE__,
+      [spec[:mod], spec[:args], spec[:name], spec[:on_conflict]],
+      name: spec[:child_name]
     )
   end
 
@@ -67,7 +63,7 @@ defmodule Singleton.Manager do
           pid
 
         {:error, {:already_started, pid}} ->
-          state.on_conflict.()
+          state.on_conflict && state.on_conflict.()
           pid
       end
 
