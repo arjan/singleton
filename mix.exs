@@ -5,7 +5,7 @@ defmodule Singleton.Mixfile do
     [
       app: :singleton,
       version: File.read!("VERSION"),
-      elixir: "~> 1.7",
+      elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
@@ -15,7 +15,8 @@ defmodule Singleton.Mixfile do
       homepage_url: "https://github.com/arjan/singleton",
       deps: deps(),
       aliases: aliases(),
-      preferred_cli_env: [quality: :test]
+      preferred_cli_env: [quality: :test],
+      dialyzer: [flags: ["-Wunmatched_returns", :error_handling, :underspecs]]
     ]
   end
 
@@ -34,7 +35,7 @@ defmodule Singleton.Mixfile do
 
   # Configuration for the OTP application
   def application do
-    [applications: [:logger]]
+    [extra_applications: [:logger]]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
@@ -42,7 +43,7 @@ defmodule Singleton.Mixfile do
 
   defp deps do
     [
-      {:dialyxir, "~> 1.2", only: [:test, :dev], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false}
     ]
   end
