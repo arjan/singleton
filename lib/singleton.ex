@@ -75,12 +75,4 @@ defmodule Singleton do
     bin = :crypto.hash(:sha, :erlang.term_to_binary({module, args}))
     String.to_atom("singleton_" <> Base.encode64(bin, padding: false))
   end
-
-  defp dynamic_supervisor_options() do
-    [
-      strategy: :one_for_one,
-      name: Singleton.Supervisor
-    ]
-    |> Keyword.merge(Application.get_env(:singleton, :dynamic_supervisor, []))
-  end
 end
