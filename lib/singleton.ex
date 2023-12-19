@@ -1,21 +1,12 @@
 defmodule Singleton do
   @moduledoc """
-  Singleton application.
+  Singleton.
 
-  The top supervisor of the `:singleton` OTP application is a
-  DynamicSupervisor. Singleton can manage many singleton processes at
-  the same time. Each singleton is identified by its unique `name`
-  term.
-
+  The top supervisor of singleton is a DynamicSupervisor, started in
+  your application's own OTP tree. Singleton can manage many singleton
+  processes at the same time. Each singleton is identified by its
+  unique `name` term.
   """
-
-  use Application
-
-  require Logger
-
-  def start(_, _) do
-    DynamicSupervisor.start_link(dynamic_supervisor_options())
-  end
 
   @doc """
   Start a new singleton process. Optionally provide the `on_conflict`
@@ -29,7 +20,13 @@ defmodule Singleton do
   case of node disconnects or crashes.
 
   """
-  def start_child(module, args, name, on_conflict \\ fn -> nil end) do
+  def start_child(
+        supervisor_name,
+        module,
+        args,
+        name,
+        on_conflict \\ fn -> nil end
+      ) do
     child_name = name(module, args)
 
     spec =
@@ -42,28 +39,40 @@ defmodule Singleton do
          on_conflict: on_conflict
        ]}
 
-    DynamicSupervisor.start_child(Singleton.Supervisor, spec)
+    case Process.whereis(supervisor_name) do
+      nil ->
+        raise("""
+        No process found with name #{supervisor_name}.
+
+        Singleton.Supervisor must be added to your application's supervision tree.
+
+        If your application includes a supervision tree in `application.ex`, you can
+        simply add `Singleton.Supervisor` to the list of children.
+
+            children = [
+              ...,
+              {Singleton.Supervisor, name: MyApp.Singleton}
+            ]
+
+            supervisor = Supervisor.start_link(children, opts)
+        """)
+
+      _pid ->
+        DynamicSupervisor.start_child(supervisor_name, spec)
+    end
   end
 
-  def stop_child(module, args) do
+  def stop_child(supervisor_name, module, args) do
     child_name = name(module, args)
 
     case Process.whereis(child_name) do
       nil -> {:error, :not_found}
-      pid -> DynamicSupervisor.terminate_child(Singleton.Supervisor, pid)
+      pid -> DynamicSupervisor.terminate_child(supervisor_name, pid)
     end
   end
 
   defp name(module, args) do
     bin = :crypto.hash(:sha, :erlang.term_to_binary({module, args}))
     String.to_atom("singleton_" <> Base.encode64(bin, padding: false))
-  end
-
-  defp dynamic_supervisor_options() do
-    [
-      strategy: :one_for_one,
-      name: Singleton.Supervisor
-    ]
-    |> Keyword.merge(Application.get_env(:singleton, :dynamic_supervisor, []))
   end
 end
