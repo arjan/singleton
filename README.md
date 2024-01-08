@@ -37,7 +37,7 @@ supervisor = Supervisor.start_link(children, opts)
 
 ## Usage
 
-Use `Singleton.start_child/3` to start a unique GenServer process.
+Use `Singleton.start_child/4` to start a unique GenServer process.
 
 ```elixir
 Singleton.start_child(MyApp.Singleton, MyServer, [1], {:myserver, 1})
